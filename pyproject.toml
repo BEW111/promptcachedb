@@ -2,12 +2,13 @@
 name = "promptcachedb"
 version = "0.1.0"
 description = "Add your description here"
-authors = [
-    { name = "BEW111", email = "bewilliams111@gmail.com" }
-]
-dependencies = []
+authors = [{ name = "BEW111", email = "bewilliams111@gmail.com" }]
+dependencies = ["transformers>=4.45.2", "torch>=2.4.1", "mypy>=1.11.2"]
 readme = "README.md"
-requires-python = ">= 3.8"
+requires-python = ">= 3.12"
+
+[project.scripts]
+"demo" = "demo:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -22,3 +23,7 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/promptcachedb"]
+
+[[tool.rye.sources]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cpu"

@@ -8,3 +8,6 @@ wheels/
 
 # venv
 .venv
+
+# promptcachedb
+demo/prompt_cache
