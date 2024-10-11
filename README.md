@@ -7,6 +7,7 @@ Cache LLM prompts to a persistent database
 Currently there's a demo that stores prompt caches to disk locally. You
 can test this by:
 
-- Installing Rye
-- `rye sync`
-- `rye run demo`
+- Cloning this repo
+- [Installing uv](https://docs.astral.sh/uv/getting-started/installation/)
+- `uv sync`
+- `uv run demo`
