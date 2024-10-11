@@ -1,15 +1,16 @@
-import os, copy
+import copy
 from itertools import chain
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache  # type: ignore
 from safetensors.torch import save_file, load_file
 
-from promptcachedb.on_disk_cache import cache_prompt_and_save_to_disk, load_prompt_cache_from_disk
+from promptcachedb.on_disk_cache import PromptMetadata, cache_prompt_and_save_to_disk, load_prompt_cache_from_disk
 
-MODEL_NAME = "Qwen/Qwen2.5-0.5B"
 
 PROMPT_CACHE_PATH = "./prompt_cache"
+
+MODEL_NAME = "Qwen/Qwen2.5-0.5B"
 
 INITIAL_PROMPT="""
 Prompt caching + persistent prompt db
@@ -27,21 +28,32 @@ Prompt caching + persistent prompt db
 def main() -> int:
     print("Demo running!")
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, torch_dtype=torch.float16)
-    model = model.to(device)
+    model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, torch_dtype=torch.float16).to(device)
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
     print("Saving cached prompts to disk...")
-    cache_prompt_and_save_to_disk(model, tokenizer, INITIAL_PROMPT, device, PROMPT_CACHE_PATH)
+    cache_prompt_and_save_to_disk(
+        model=model, 
+        tokenizer=tokenizer, 
+        prompt=INITIAL_PROMPT, 
+        prompt_name="project_description", 
+        device=device,
+        path=PROMPT_CACHE_PATH
+    )
 
     print("Loading cached prompts from disk...")
-    reloaded_prompt_cache = load_prompt_cache_from_disk(INITIAL_PROMPT, device, PROMPT_CACHE_PATH)
+    prompt_metadata = PromptMetadata(
+        prompt_name="project_description",
+        model_name=MODEL_NAME
+    )
+    reloaded_prompt_cache = load_prompt_cache_from_disk(prompt_metadata, device, PROMPT_CACHE_PATH)
 
     print("Running model with cached prompt prefix and different prompts")
     prompts = ["\n# Project Name", "\n# Next Steps", "\n# Potential issues"]
     responses = []
-
+    
     for prompt in prompts:
+        # TODO: we should also abstract out this step of generation, but not a priority for now
         full_prompt = INITIAL_PROMPT + prompt
         new_inputs = tokenizer(full_prompt, return_tensors="pt").to(device)
 

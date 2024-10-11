@@ -1,8 +1,18 @@
 from itertools import chain
+from dataclasses import dataclass
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache  # type: ignore
 from safetensors.torch import save_file, load_file
+
+
+@dataclass(frozen=True)
+class PromptMetadata:
+    prompt_name: str
+    model_name: str
+
+    def get_file_name(self) -> str:
+        return str(hash(self))
 
 
 def _save_cache_to_disk(prompt_cache: DynamicCache, path: str):
@@ -36,6 +46,7 @@ def cache_prompt_and_save_to_disk(
     model: AutoModelForCausalLM, 
     tokenizer: AutoTokenizer,
     prompt: str,
+    prompt_name: str,
     device: str,
     path: str,
 ):
@@ -44,14 +55,16 @@ def cache_prompt_and_save_to_disk(
     with torch.no_grad():
         original_prompt_cache = model(**inputs_initial_prompt, past_key_values=original_prompt_cache).past_key_values
 
-    full_path = f"{path}/{hash(prompt)}.safetensors"
+    prompt_metadata = PromptMetadata(prompt_name, model.config._name_or_path)
+
+    full_path = f"{path}/{prompt_metadata.get_file_name()}.safetensors"
     _save_cache_to_disk(original_prompt_cache, full_path)
 
 
 def load_prompt_cache_from_disk(
-    prompt: str,
+    prompt_metadata: PromptMetadata,
     device: str,
     path: str
 ) -> DynamicCache:
-    full_path = f"{path}/{hash(prompt)}.safetensors"
+    full_path = f"{path}/{prompt_metadata.get_file_name()}.safetensors"
     return _load_cache_from_disk(full_path, device)
