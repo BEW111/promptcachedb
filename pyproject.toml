@@ -3,7 +3,7 @@ name = "promptcachedb"
 version = "0.1.0"
 description = "Add your description here"
 authors = [{ name = "BEW111", email = "bewilliams111@gmail.com" }]
-dependencies = ["transformers>=4.45.2", "torch>=2.4.1"]
+dependencies = ["transformers>=4.45.2", "torch>=2.4.1", "requests>=2.32.3"]
 readme = "README.md"
 requires-python = ">= 3.12"
 
@@ -16,7 +16,10 @@ build-backend = "hatchling.build"
 
 [tool.uv]
 managed = true
-dev-dependencies = ["mypy>=1.11.2"]
+dev-dependencies = ["mypy>=1.11.2", "types-requests"]
+
+[tool.uv.workspace]
+members = ["packages/*"]
 
 [tool.hatch.metadata]
 allow-direct-references = true

@@ -1,14 +1,14 @@
-import copy
+import os
 from itertools import chain
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache  # type: ignore
-from safetensors.torch import save_file, load_file
+from promptcachedb.cache_pipeline import PipelineWithPromptCache
+from promptcachedb.client import PromptCacheClient
 
-from promptcachedb.on_disk_cache import PromptMetadata, cache_prompt_and_save_to_disk, load_prompt_cache_from_disk
 
-
-PROMPT_CACHE_PATH = "./prompt_cache"
+PROMPT_CACHE_PATH = "./demo_prompt_cache"
+os.makedirs(PROMPT_CACHE_PATH, exist_ok=True)
 
 MODEL_NAME = "Qwen/Qwen2.5-0.5B"
 
@@ -25,48 +25,36 @@ Prompt caching + persistent prompt db
 """
 
 
-def main() -> int:
+def demo_with_on_disk_cache():
     print("Demo running!")
+    pc_client = PromptCacheClient(storage_type="local", path_or_url=PROMPT_CACHE_PATH)
+    # pc_client = PromptCacheClient(storage_type="server", path_or_url="http://localhost:8000")
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, torch_dtype=torch.float16).to(device)
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+    pc_pipeline = PipelineWithPromptCache(model, tokenizer, device, client=pc_client)
 
     print("Saving cached prompts to disk...")
-    cache_prompt_and_save_to_disk(
-        model=model, 
-        tokenizer=tokenizer, 
+    pc_pipeline.cache_prompt_and_save_to_disk(
         prompt=INITIAL_PROMPT, 
-        prompt_name="project_description", 
-        device=device,
-        path=PROMPT_CACHE_PATH
+        prompt_name="project_description"
     )
-
-    print("Loading cached prompts from disk...")
-    prompt_metadata = PromptMetadata(
-        prompt_name="project_description",
-        model_name=MODEL_NAME
-    )
-    reloaded_prompt_cache = load_prompt_cache_from_disk(prompt_metadata, device, PROMPT_CACHE_PATH)
 
     print("Running model with cached prompt prefix and different prompts")
     prompts = ["\n# Project Name", "\n# Next Steps", "\n# Potential issues"]
-    responses = []
     
     for prompt in prompts:
-        # TODO: we should also abstract out this step of generation, but not a priority for now
-        full_prompt = INITIAL_PROMPT + prompt
-        new_inputs = tokenizer(full_prompt, return_tensors="pt").to(device)
-
-        # We need to make a copy of the original cache for each prompt, since
-        # it gets modified by each of the generation runs in `prompts`
-        cache = copy.deepcopy(reloaded_prompt_cache)
-        outputs = model.generate(**new_inputs, past_key_values=cache, max_new_tokens=25)
-        response = tokenizer.batch_decode(outputs)[0]
-        responses.append(response)
-
-    for prompt, response in zip(prompts, responses):
-        full_prompt = INITIAL_PROMPT + prompt
+        response = pc_pipeline.generate_with_cache_from_disk(
+            cached_prompt_name="project_description",
+            prompt=prompt,
+            max_new_tokens=25
+        )
         print(prompt)
-        print(response[len(full_prompt):])
+        print(response)
+
+
+def main() -> int:
+    demo_with_on_disk_cache()
 
     return 0

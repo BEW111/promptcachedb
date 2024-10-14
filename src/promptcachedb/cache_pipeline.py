@@ -5,21 +5,16 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache  # type: ignore
 from safetensors.torch import save_file, load_file
 
-
-@dataclass(frozen=True)
-class PromptMetadata:
-    prompt_name: str
-    model_name: str
-
-    def get_file_name(self) -> str:
-        return str(hash(self))
+from .prompt_metadata import PromptMetadata
+from .client import PromptCacheClient
 
 
 class PipelineWithPromptCache:
-    def __init__(self, model: AutoModelForCausalLM, tokenizer: AutoTokenizer, device: str) -> None:
+    def __init__(self, model: AutoModelForCausalLM, tokenizer: AutoTokenizer, device: str, client: PromptCacheClient) -> None:
         self.model = model
         self.tokenizer = tokenizer
         self.device = device
+        self.client = client
 
         # TODO: Temp way to store prompt name -> prompt; we should do this in the server later
         self.prompts: dict[PromptMetadata, str] = {}
@@ -60,15 +55,11 @@ class PipelineWithPromptCache:
         return cache
 
     
-    def cache_prompt_and_save_to_disk(self, prompt: str, prompt_name: str, cache_path: str) -> None:
+    def cache_prompt_and_save_to_disk(self, prompt: str, prompt_name: str) -> None:
         prompt_metadata = PromptMetadata(prompt_name, self.model.config._name_or_path)
-        cache_file_location = f"{cache_path}/{prompt_metadata.get_file_name()}.safetensors"
-
         prompt_cache = self._cache_prompt(prompt)
         tensors = self._dynamiccache_to_kv_tensors(prompt_cache)
-        print(cache_file_location)
-        save_file(tensors, cache_file_location)
-
+        self.client.upload_cache(tensors, prompt_metadata)
         self.prompts[prompt_metadata] = prompt
 
     
@@ -76,13 +67,10 @@ class PipelineWithPromptCache:
         self, 
         cached_prompt_name: str, 
         prompt: str, 
-        max_new_tokens: int, 
-        cache_path: str
+        max_new_tokens: int
     ) -> str:
         cached_prompt_metadata = PromptMetadata(cached_prompt_name, self.model.config._name_or_path)
-        cache_file_location = f"{cache_path}/{cached_prompt_metadata.get_file_name()}.safetensors"
-
-        kv_tensors = load_file(cache_file_location)
+        kv_tensors = self.client.load_cache(cached_prompt_metadata)
         prompt_cache = self._kv_tensors_to_dynamiccache(kv_tensors)
 
         prompt_with_prefix = self.prompts[cached_prompt_metadata] + prompt
