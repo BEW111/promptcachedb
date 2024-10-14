@@ -23,7 +23,7 @@ class PromptCacheClient:
             save_file(tensors, cache_file_path)
         else:
             byte_data = save(tensors)
-            files = {'file': (cache_file_name, byte_data)}
+            files = {"prompt_cache_file": (cache_file_name, byte_data)}
             response = requests.post(f"{self.path_or_url}/upload", files=files)
             response.raise_for_status()
 

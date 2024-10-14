@@ -27,8 +27,8 @@ Prompt caching + persistent prompt db
 
 def demo_with_on_disk_cache():
     print("Demo running!")
-    pc_client = PromptCacheClient(storage_type="local", path_or_url=PROMPT_CACHE_PATH)
-    # pc_client = PromptCacheClient(storage_type="server", path_or_url="http://localhost:8000")
+    # pc_client = PromptCacheClient(storage_type="local", path_or_url=PROMPT_CACHE_PATH)
+    pc_client = PromptCacheClient(storage_type="server", path_or_url="http://localhost:8000")
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, torch_dtype=torch.float16).to(device)

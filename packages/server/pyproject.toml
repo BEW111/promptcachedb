@@ -1,0 +1,9 @@
+[project]
+name = "server"
+version = "0.1.0"
+description = "Server for promptcachedb"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.115.2",
+    "python-multipart>=0.0.12",
+]

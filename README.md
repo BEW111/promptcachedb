@@ -11,3 +11,12 @@ can test this by:
 - [Installing uv](https://docs.astral.sh/uv/getting-started/installation/)
 - `uv sync`
 - `uv run demo`
+
+## Running the server
+
+- `cd` into `packages/server`
+- `uv sync`
+- `uv run --package server fastapi dev`
+
+I'm new to `uv` so not 100% about this, but I think you need to run `uv sync` every time you
+switch between running the demo and the server.
