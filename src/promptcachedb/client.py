@@ -15,7 +15,7 @@ class PromptCacheClient:
         self.path_or_url = path_or_url
 
 
-    def upload_cache(self, tensors: dict[str, torch.Tensor], prompt_metadata: PromptMetadata) -> None:
+    def _upload_cache(self, tensors: dict[str, torch.Tensor], prompt_metadata: PromptMetadata) -> None:
         cache_file_name = f"{prompt_metadata.get_file_name()}.safetensors"
 
         if self.storage_type == "local":
@@ -28,7 +28,7 @@ class PromptCacheClient:
             response.raise_for_status()
 
 
-    def load_cache(self, prompt_metadata: PromptMetadata) -> dict[str, torch.Tensor]:
+    def _load_cache(self, prompt_metadata: PromptMetadata) -> dict[str, torch.Tensor]:
         cache_file_name = f"{prompt_metadata.get_file_name()}.safetensors"
 
         if self.storage_type == "local":

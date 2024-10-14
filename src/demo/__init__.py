@@ -36,16 +36,13 @@ def demo_with_on_disk_cache():
     pc_pipeline = PipelineWithPromptCache(model, tokenizer, device, client=pc_client)
 
     print("Saving cached prompts to disk...")
-    pc_pipeline.cache_prompt_and_save_to_disk(
-        prompt=INITIAL_PROMPT, 
-        prompt_name="project_description"
-    )
+    pc_pipeline.cache_and_upload_prompt(prompt=INITIAL_PROMPT, prompt_name="project_description")
 
     print("Running model with cached prompt prefix and different prompts")
     prompts = ["\n# Project Name", "\n# Next Steps", "\n# Potential issues"]
     
     for prompt in prompts:
-        response = pc_pipeline.generate_with_cache_from_disk(
+        response = pc_pipeline.generate_with_cache(
             cached_prompt_name="project_description",
             prompt=prompt,
             max_new_tokens=25

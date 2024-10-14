@@ -55,22 +55,23 @@ class PipelineWithPromptCache:
         return cache
 
     
-    def cache_prompt_and_save_to_disk(self, prompt: str, prompt_name: str) -> None:
+    def cache_and_upload_prompt(self, prompt: str, prompt_name: str) -> None:
         prompt_metadata = PromptMetadata(prompt_name, self.model.config._name_or_path)
         prompt_cache = self._cache_prompt(prompt)
         tensors = self._dynamiccache_to_kv_tensors(prompt_cache)
-        self.client.upload_cache(tensors, prompt_metadata)
+
         self.prompts[prompt_metadata] = prompt
+        self.client._upload_cache(tensors, prompt_metadata)        
 
     
-    def generate_with_cache_from_disk(
+    def generate_with_cache(
         self, 
         cached_prompt_name: str, 
         prompt: str, 
         max_new_tokens: int
     ) -> str:
         cached_prompt_metadata = PromptMetadata(cached_prompt_name, self.model.config._name_or_path)
-        kv_tensors = self.client.load_cache(cached_prompt_metadata)
+        kv_tensors = self.client._load_cache(cached_prompt_metadata)
         prompt_cache = self._kv_tensors_to_dynamiccache(kv_tensors)
 
         prompt_with_prefix = self.prompts[cached_prompt_metadata] + prompt
