@@ -25,7 +25,7 @@ Prompt caching + persistent prompt db
 """
 
 
-def demo_with_on_disk_cache():
+def main() -> int:
     print("Demo running!")
     # pc_client = PromptCacheClient(storage_type="local", path_or_url=PROMPT_CACHE_PATH)
     pc_client = PromptCacheClient(storage_type="server", path_or_url="http://localhost:8000")
@@ -49,9 +49,5 @@ def demo_with_on_disk_cache():
         )
         print(prompt)
         print(response)
-
-
-def main() -> int:
-    demo_with_on_disk_cache()
 
     return 0
