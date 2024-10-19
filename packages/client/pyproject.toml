@@ -1,16 +1,9 @@
 [project]
-name = "promptcachedb"
+name = "promptcachedb-client"
 version = "0.1.0"
-description = "Add your description here"
-authors = [{ name = "BEW111", email = "bewilliams111@gmail.com" }]
-dependencies = [
-    "transformers>=4.45.2",
-    "torch>=2.4.1",
-    "requests>=2.32.3",
-    "fastapi[standard]>=0.115.2",
-]
-readme = "README.md"
-requires-python = ">= 3.12"
+description = "promptcachedb client"
+requires-python = ">=3.12"
+dependencies = ["transformers>=4.45.2", "torch>=2.4.1", "requests>=2.32.3"]
 
 [project.scripts]
 "demo" = "demo:main"
@@ -30,4 +23,4 @@ members = ["packages/*"]
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/promptcachedb"]
+packages = ["src/promptcachedb_client"]

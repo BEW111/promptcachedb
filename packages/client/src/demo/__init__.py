@@ -3,8 +3,8 @@ from itertools import chain
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache  # type: ignore
-from promptcachedb.cache_pipeline import PipelineWithPromptCache
-from promptcachedb.client import PromptCacheClient
+from promptcachedb_client.cache_pipeline import PipelineWithPromptCache
+from promptcachedb_client.client import PromptCacheClient
 
 
 PROMPT_CACHE_PATH = "./demo_prompt_cache"
