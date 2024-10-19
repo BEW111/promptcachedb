@@ -18,6 +18,3 @@ can test this by:
 ## Running the demo
 
 - `uv run --package promptcachedb-client demo`
-
-I'm new to `uv` so not 100% about this, but I think you need to run `uv sync` every time you
-switch between running the demo and the server.
