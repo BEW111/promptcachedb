@@ -1,5 +1,4 @@
 import os
-from itertools import chain
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache  # type: ignore
@@ -27,7 +26,6 @@ Prompt caching + persistent prompt db
 
 def main() -> int:
     print("Demo running!")
-    # pc_client = PromptCacheClient(storage_type="local", path_or_url=PROMPT_CACHE_PATH)
     pc_client = PromptCacheClient(storage_type="server", path_or_url="http://localhost:8000")
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
