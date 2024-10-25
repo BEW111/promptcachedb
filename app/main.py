@@ -9,8 +9,8 @@ from safetensors.torch import load_file, save_file
 
 app = FastAPI()
 
-CACHE_DIR = "./demo_prompt_cache"
-os.makedirs(CACHE_DIR, exist_ok=True)
+SERVER_CACHE_DIR = "./server_prompt_cache"
+os.makedirs(SERVER_CACHE_DIR, exist_ok=True)
 
 
 @app.get("/")
@@ -24,7 +24,7 @@ async def upload_safetensor(prompt_cache_file: UploadFile = File(...)):
     if not prompt_cache_file.filename:
         raise HTTPException(status_code=400, detail=f"Empty filename")
     
-    file_path = os.path.join(CACHE_DIR, prompt_cache_file.filename)
+    file_path = os.path.join(SERVER_CACHE_DIR, prompt_cache_file.filename)
     
     try:
         with open(file_path, "wb") as buffer:
@@ -37,7 +37,7 @@ async def upload_safetensor(prompt_cache_file: UploadFile = File(...)):
 @app.get("/load/{prompt_cache_file_id}")
 async def load_safetensor(prompt_cache_file_id: str):
     """Stream a safetensors file"""
-    file_path = os.path.join(CACHE_DIR, f"{prompt_cache_file_id}.safetensors")
+    file_path = os.path.join(SERVER_CACHE_DIR, f"{prompt_cache_file_id}.safetensors")
     
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")

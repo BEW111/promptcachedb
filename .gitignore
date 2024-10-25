@@ -10,4 +10,4 @@ wheels/
 .venv
 
 # promptcachedb
-demo_prompt_cache
+server_prompt_cache

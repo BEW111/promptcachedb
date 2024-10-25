@@ -1,4 +1,5 @@
 import os
+import glob
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache, pipeline  # type: ignore
@@ -8,16 +9,7 @@ from promptcachedb_client.client import PromptCacheClient
 from timeit import timeit
 
 
-PROMPT_CACHE_PATH = "./benchmark_cache"
-os.makedirs(PROMPT_CACHE_PATH, exist_ok=True)
-
 MODEL_NAME = "Qwen/Qwen2.5-0.5B"
-
-'''
-below is an interesting example, because normally you'd probably try to generate all sections
-in one prompt. but now we can generate multiple sections, in parallel, using a cached prompt
-
-'''
 
 INITIAL_PROMPT="""
 Prompt caching + persistent prompt db
@@ -63,10 +55,12 @@ def run_prompt_with_suffixes(use_prompt_cache: bool):
 
 
 def main() -> int:
-    print("Running without prompt cache")
-    print(timeit('run_prompt_with_suffixes(use_prompt_cache=False)', globals=globals(), number=1))
+    print("Running model without persistent prompt cache")
+    without_cache_time = timeit('run_prompt_with_suffixes(use_prompt_cache=False)', globals=globals(), number=1)
+    print(f"Took {without_cache_time} seconds to run")
 
-    print("Running with prompt cache")
-    print(timeit('run_prompt_with_suffixes(use_prompt_cache=True)', globals=globals(), number=1))
+    print("Running model with persistent prompt cache")
+    with_cache_time = timeit('run_prompt_with_suffixes(use_prompt_cache=True)', globals=globals(), number=1)
+    print(f"Took {with_cache_time} seconds to run")
 
     return 0
