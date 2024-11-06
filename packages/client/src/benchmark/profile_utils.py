@@ -3,7 +3,7 @@ import pstats
 import functools
 
 
-def profile_function(profile_filename="profile.prof"):
+def cprofile_function_and_save(profile_filename="profile.prof"):
     def decorator(f):
         @functools.wraps(f)
         def wrapper(*args, **kwargs):

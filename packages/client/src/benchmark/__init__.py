@@ -7,7 +7,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache, pipe
 
 from promptcachedb_client import pipeline as pc_pipeline, PromptCacheClient, PipelineWithPromptCache
 from .prompts import WIKIPEDIA_PROMPT_PREFIX, WIKIPEDIA_PROMPT_SUFFIXES, SHORT_PROMPT_PREFIX, SHORT_PROMPT_SUFFIXES
-from .profile import profile_function
+from .profile_utils import cprofile_function_and_save
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -58,9 +58,7 @@ def benchmark() -> int:
     print("Running model with persistent prompt cache")
     with_cache_responses = run_with_cache()
 
-    responses_match = [r1 == r2 for r1, r2 in zip(without_cache_responses, with_cache_responses)]
-    print("Responses match?", responses_match)
-
+    assert without_cache_responses == with_cache_responses, "Responses don't match!"
     return 0
 
 
