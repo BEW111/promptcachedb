@@ -1,9 +1,7 @@
-from dataclasses import dataclass
 from itertools import chain
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache  # type: ignore
-from safetensors.torch import save_file, load_file
 
 from .prompt_metadata import PromptMetadata
 from .client import PromptCacheClient
@@ -32,6 +30,8 @@ class PipelineWithPromptCache:
     def _dynamiccache_to_kv_tensors(self, prompt_cache: DynamicCache) -> dict[str, torch.Tensor]:
         tensors = {
             # We should investigate why the KV tensors are not contiguous
+            # - I think this just has to do with the cache using a view of the tensor?
+            # - And since saving tensors seems to be fast, I don't think we have to worry
             f"{key_or_value}_{layer_index}": tensor.contiguous()
             for key_or_value, layer_index, tensor in
             chain(
@@ -81,3 +81,9 @@ class PipelineWithPromptCache:
         response = self.tokenizer.batch_decode(outputs)[0]
 
         return response
+
+
+def pipeline(model: str, device: str, client: PromptCacheClient):
+    model_instance = AutoModelForCausalLM.from_pretrained(model).to(device)
+    tokenizer_instance = AutoTokenizer.from_pretrained(model)
+    return PipelineWithPromptCache(model_instance, tokenizer_instance, device, client)

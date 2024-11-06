@@ -2,9 +2,7 @@ from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import StreamingResponse
 
 import os
-import torch
 import shutil
-from safetensors.torch import load_file, save_file
 
 
 app = FastAPI()
@@ -22,7 +20,7 @@ async def root():
 async def upload_safetensor(prompt_cache_file: UploadFile = File(...)):
     """Upload a safetensors file to the server"""
     if not prompt_cache_file.filename:
-        raise HTTPException(status_code=400, detail=f"Empty filename")
+        raise HTTPException(status_code=400, detail="Empty filename")
     
     file_path = os.path.join(SERVER_CACHE_DIR, prompt_cache_file.filename)
     

@@ -1,7 +1,6 @@
-import io
 import os
 import requests
-from typing import Union, Literal
+from typing import Literal
 
 import torch
 from safetensors.torch import save, save_file, load, load_file
