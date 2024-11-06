@@ -5,8 +5,9 @@ from timeit import timeit
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache, pipeline  # type: ignore
 
-from promptcachedb_client import pipeline as pc_pipeline, PromptCacheClient, PipelineWithPromptCache, profile_function
+from promptcachedb_client import pipeline as pc_pipeline, PromptCacheClient, PipelineWithPromptCache
 from .prompts import WIKIPEDIA_PROMPT_PREFIX, WIKIPEDIA_PROMPT_SUFFIXES, SHORT_PROMPT_PREFIX, SHORT_PROMPT_SUFFIXES
+from .profile import profile_function
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
