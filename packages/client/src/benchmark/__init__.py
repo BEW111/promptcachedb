@@ -1,5 +1,6 @@
 import os
 import glob
+import itertools
 from timeit import timeit
 from typing import Literal
 
@@ -82,20 +83,27 @@ def run_benchmark():
     model = MODEL_NAME
     metadata = "running locally nov 7"
 
-    # modes = ["no_cache", "local_cache", "server_cache"]
-    # prompt_names = ["short_markdown", "wikipedia_llms"]
-    # number_suffixes = [1, 2, 3]
-    # max_new_tokens = [10, 25, 50]
+    mode_options = ["no_cache", "local_cache", "server_cache"]
+    prompt_name_options = ["short_markdown"]
+    number_suffixes_options = [1, 2, 3]
+    max_new_tokens_options = [10]
 
-    config = BenchmarkConfig(
-        mode="no_cache",
-        prompt_name="short_markdown",
-        number_suffixes=2,
-        max_new_tokens=25,
-        model_name=model,
-        metadata=metadata
-    )
-    run_with_benchmark_config(config)
+    for mode, prompt_name, number_suffixes, max_new_tokens in itertools.product(
+        mode_options, 
+        prompt_name_options, 
+        number_suffixes_options, 
+        max_new_tokens_options
+    ):
+        config = BenchmarkConfig(
+            mode=mode,
+            prompt_name=prompt_name,
+            number_suffixes=number_suffixes,
+            max_new_tokens=max_new_tokens,
+            model_name=model,
+            metadata=metadata
+        )
+        print("Running with config:", config)
+        run_with_benchmark_config(config)
 
 
 def main() -> int:

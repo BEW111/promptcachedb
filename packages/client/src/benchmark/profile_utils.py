@@ -42,6 +42,7 @@ def time_and_log(section_name: str, benchmark_config: BenchmarkConfig):
     
     log_entry = asdict(benchmark_config)
     log_entry["section_name"] = section_name
+    log_entry["start_time"] = start_time
     log_entry["duration"] = duration
     
     with open(LOG_FILE, "a") as log_file:
