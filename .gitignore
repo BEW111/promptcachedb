@@ -11,3 +11,4 @@ wheels/
 
 # promptcachedb
 server_prompt_cache
+profile_logs.jsonl

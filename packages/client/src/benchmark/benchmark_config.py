@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Literal
 
-from .prompts import prompts, PromptName
+from .prompts import PromptName
 
 
 @dataclass

@@ -48,3 +48,15 @@ async def load_safetensor(prompt_cache_file_id: str):
         'Content-Disposition': f'attachment; filename="{prompt_cache_file_id}.safetensors"'
     })
 
+
+@app.post("/clear_cache/")
+async def clear_cache():
+    """Remove all files from the cache on this server"""
+    folder = Path(SERVER_CACHE_DIR)
+    for file in folder.glob("*.safetensors"):
+        try:
+            file.unlink()
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to delete {file}. Reason: {e}")
+
+    return {"message": "Cleaned cache succesfully!"}

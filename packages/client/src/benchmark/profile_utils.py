@@ -1,5 +1,4 @@
 import cProfile
-import pstats
 import functools
 import json
 import time
@@ -9,7 +8,7 @@ from dataclasses import asdict
 from .benchmark_config import BenchmarkConfig
 
 
-LOG_FILE = "./profile_logs.jsonl"
+LOG_FILE = "./benchmarking_analysis/profile_logs.jsonl"
 
 
 def cprofile_function_and_save(profile_filename="profile.prof"):

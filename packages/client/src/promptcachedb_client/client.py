@@ -37,3 +37,4 @@ class PromptCacheClient:
             response = requests.get(f"{self.path_or_url}/load/{prompt_metadata.get_file_name()}")
             response.raise_for_status()
             return load(response.content)
+    

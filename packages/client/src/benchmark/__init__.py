@@ -1,6 +1,7 @@
 import os
 import glob
 import itertools
+import requests
 from timeit import timeit
 from typing import Literal
 
@@ -15,6 +16,8 @@ from .profile_utils import time_and_log
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
+LOCAL_PROMPT_CACHE_PATH = "./server_prompt_cache"
+SERVER_URL = "http://localhost:8000"
 
 
 def run_with_benchmark_config(benchmark_config: BenchmarkConfig):
@@ -38,11 +41,11 @@ def run_with_benchmark_config(benchmark_config: BenchmarkConfig):
             responses.append(response)
     else:
         storage_type: Literal['local', 'server'] = "local"
-        path_or_url: str = "./server_prompt_cache"
+        path_or_url = LOCAL_PROMPT_CACHE_PATH
 
         if benchmark_config.mode == "server_cache":
             storage_type = "server"
-            path_or_url = "http://localhost:8000"
+            path_or_url = SERVER_URL
 
         with time_and_log(section_name="create_pc_client", benchmark_config=benchmark_config):
             pc_client = PromptCacheClient(storage_type=storage_type, path_or_url=path_or_url)
@@ -65,28 +68,34 @@ def run_with_benchmark_config(benchmark_config: BenchmarkConfig):
     return responses
 
 
-def clean_previous_cache():
-    # clean server if necessary
-    # clean local cache if necessary
-    ...
+
+def delete_safetensors_files(folder_path):
+    folder = Path(folder_path)
+    for file in folder.glob("*.safetensors"):
+        try:
+            file.unlink()
+        except Exception as e:
+            print(f"Failed to delete {file}. Reason: {e}")
 
 
-'''
-- add clean previous cache
-- add actually logging down the times of various events
-  - i think ill just make a "start timing event" and "end timing event" function
-    - then just insert that in various places
-    - the main thing to be concerned about here is if logging takes extra time and it's nested
-'''
+def clear_previous_cache(mode: Literal['local', 'server']):
+    if mode == "local":
+        delete_safetensors_files(LOCAL_PROMPT_CACHE_PATH)
+    
+    if mode == "server":
+        response = requests.post(f"{SERVER_URL}/clear_cache")
+        response.raise_for_status()
+
+
 
 def run_benchmark():
     model = MODEL_NAME
-    metadata = "running locally nov 7"
+    metadata = "running locally nov 8"
 
     mode_options = ["no_cache", "local_cache", "server_cache"]
     prompt_name_options = ["short_markdown"]
-    number_suffixes_options = [1, 2, 3]
-    max_new_tokens_options = [10]
+    number_suffixes_options = [1, 2, 3, 5, 10, 20]
+    max_new_tokens_options = [10, 25, 50]
 
     for mode, prompt_name, number_suffixes, max_new_tokens in itertools.product(
         mode_options, 
@@ -104,6 +113,9 @@ def run_benchmark():
         )
         print("Running with config:", config)
         run_with_benchmark_config(config)
+
+        if mode == "local_cache" or mode == "server_cache":
+            clear_previous_cache(mode)
 
 
 def main() -> int:
