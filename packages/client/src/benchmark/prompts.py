@@ -1,3 +1,5 @@
+from typing import Literal
+
 SHORT_PROMPT_PREFIX="""
 Prompt caching + persistent prompt db
 
@@ -10,7 +12,59 @@ Prompt caching + persistent prompt db
 - I really like one of the extensions—making a publicly available prompt cache api
 """
 
-SHORT_PROMPT_SUFFIXES = ["\n# Project Name", "\n# Next Steps", "\n# Potential issues", "\n# Thoughts"]
+SHORT_PROMPT_SUFFIXES = [
+    "\n# Project Name",
+    "\n# Next Steps",
+    "\n# Potential issues",
+    "\n# Thoughts",
+    "\n# Key Design Decisions",
+    "\n# Core Features",
+    "\n# Implementation Plan",
+    "\n# Testing Strategy",
+    "\n# Optimization Tips",
+    "\n# Future Enhancements",
+    "\n# Database Options",
+    "\n# Security Considerations",
+    "\n# User Documentation",
+    "\n# API Design",
+    "\n# Performance Benchmarks",
+    "\n# Scalability Concerns",
+    "\n# Caching Strategy",
+    "\n# Error Handling",
+    "\n# Compatibility with HF Models",
+    "\n# Open-source Licenses",
+    "\n# Deployment Plan",
+    "\n# Logging and Monitoring",
+    "\n# Example Workflows",
+    "\n# User Feedback Loop",
+    "\n# Edge Cases",
+    "\n# Community Engagement",
+    "\n# Initial Release Milestones",
+    "\n# Schema Design for Prompt Storage",
+    "\n# Query Optimization",
+    "\n# Data Retention Policies",
+    "\n# Integration with Existing Tools",
+    "\n# Documentation Outline",
+    "\n# UI/UX for Web Interface",
+    "\n# Performance Analysis",
+    "\n# Code Review Checklist",
+    "\n# CI/CD Pipeline Setup",
+    "\n# Project Roadmap",
+    "\n# User Access Controls",
+    "\n# Debugging Procedures",
+    "\n# API Rate Limiting",
+    "\n# Customization Options",
+    "\n# Model Compatibility Testing",
+    "\n# Release Versioning",
+    "\n# Data Backup Plan",
+    "\n# Model-Specific Optimizations",
+    "\n# Community Contributions",
+    "\n# Load Testing Metrics",
+    "\n# API Key Management",
+    "\n# Documentation for Endpoints",
+    "\n# Project Retrospective",
+]
+
 
 WIKIPEDIA_PROMPT_PREFIX="""
 History
@@ -101,4 +155,63 @@ Infrastructure
 Substantial infrastructure is necessary for training the largest models.[48][49][50]
 """
 
-WIKIPEDIA_PROMPT_SUFFIXES = ["\nWhat's an LLM?", "\nIn order to build an LLM,", "\nSome shortcomings of LLMs"]
+WIKIPEDIA_PROMPT_SUFFIXES = [
+    "\nWhat's an LLM?",
+    "\nIn order to build an LLM,",
+    "\nSome shortcomings of LLMs",
+    "\nHow are LLMs trained?",
+    "\nWhat are the costs involved in training LLMs?",
+    "\nCan LLMs learn multiple languages?",
+    "\nWhy are LLMs popular for NLP?",
+    "\nWhat distinguishes LLMs from other models?",
+    "\nHow does tokenization affect LLM performance?",
+    "\nWhat is the Transformer architecture?",
+    "\nWhich companies develop LLMs?",
+    "\nHow can LLMs be fine-tuned for specific tasks?",
+    "\nHow do context windows limit LLMs?",
+    "\nWhy are large datasets important for LLMs?",
+    "\nWhat is instruction tuning?",
+    "\nHow do LLMs handle different languages?",
+    "\nWhat are some ethical concerns with LLMs?",
+    "\nWhat is reinforcement learning from human feedback?",
+    "\nWhat are the main challenges of LLMs?",
+    "\nHow does the size of a context window affect an LLM?",
+    "\nWhat is an autoregressive model?",
+    "\nWhat are masked language models?",
+    "\nWhat are some preprocessing techniques for LLMs?",
+    "\nHow is synthetic data used in LLMs?",
+    "\nHow can LLMs create synthetic data?",
+    "\nWhat is prompt engineering?",
+    "\nHow does an attention mechanism work?",
+    "\nHow is RLHF implemented in LLMs?",
+    "\nWhat is the difference between BERT and GPT?",
+    "\nWhy is dataset cleaning important for LLMs?",
+    "\nWhat is the importance of vocabulary size in tokenization?",
+    "\nWhat are the latest advancements in LLM architectures?",
+    "\nHow do fine-tuned models differ from pre-trained ones?",
+    "\nWhat are some applications of LLMs?",
+    "\nWhy do LLMs need high computational resources?",
+    "\nHow is a mixture of experts used in LLMs?",
+    "\nWhat are some limitations of tokenization?",
+    "\nHow can LLMs be optimized for specific industries?",
+    "\nWhat is the purpose of Next Sentence Prediction?",
+    "\nWhat are soft weights in attention mechanisms?",
+    "\nWhat is byte-pair encoding?",
+    "\nHow can LLMs be evaluated?",
+    "\nWhat are the memory requirements for LLMs?",
+    "\nWhat impact do LLMs have on society?",
+    "\nHow can LLMs process longer texts?",
+    "\nWhy are attention heads used in Transformers?",
+    "\nHow is overfitting avoided in LLM training?",
+    "\nWhat is the significance of embedding layers?",
+    "\nHow is model drift managed in LLMs?",
+    "\nWhat is a multimodal LLM?",
+    "\nHow does self-supervised learning apply to LLMs?",
+]
+
+PromptName = Literal["short_markdown", "wikipedia_llms"]
+
+prompts = {
+    "short_markdown": (SHORT_PROMPT_PREFIX, SHORT_PROMPT_SUFFIXES),
+    "wikipedia_llms": (WIKIPEDIA_PROMPT_PREFIX, WIKIPEDIA_PROMPT_SUFFIXES),
+}
