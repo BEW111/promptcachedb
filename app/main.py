@@ -3,12 +3,15 @@ import shutil
 from pathlib import Path
 
 from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
 
-app = FastAPI()
 
 SERVER_CACHE_DIR = "./server_prompt_cache"
 os.makedirs(SERVER_CACHE_DIR, exist_ok=True)
+
+app = FastAPI()
+app.mount("/prompt_cache", StaticFiles(directory=SERVER_CACHE_DIR), name="prompt_cache")
 
 
 @app.get("/")
@@ -32,6 +35,7 @@ async def upload_safetensor(prompt_cache_file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Error uploading file: {str(e)}")
 
 
+# TODO: may deprecate this if we switch to static files
 @app.get("/load/{prompt_cache_file_id}")
 async def load_safetensor(prompt_cache_file_id: str):
     """Stream a safetensors file"""
@@ -44,10 +48,10 @@ async def load_safetensor(prompt_cache_file_id: str):
         with open(file_path, mode="rb") as file_like:
             yield from file_like
 
-    # def iterfile():
-    #     with open(file_path, mode="rb") as file_like:
-    #         CHUNK_SIZE = 1024 * 1024
-    #         while chunk := file_like.read(CHUNK_SIZE):
+    # async def iterfile():
+    #     CHUNK_SIZE = 1024 * 1024
+    #     async with aiofiles.open(file_path, mode="rb") as f:
+    #         while chunk := await f.read(CHUNK_SIZE):
     #             yield chunk
     
     return StreamingResponse(iterfile(), media_type="application/octet-stream", headers={

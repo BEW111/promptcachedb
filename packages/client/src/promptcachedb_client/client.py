@@ -57,7 +57,7 @@ class PromptCacheClient:
             if self.cache_server_url == None:
                 raise RuntimeError("Cache server url not specified")
             
-            response = requests.get(f"{self.cache_server_url}/load/{prompt_metadata.get_file_name()}")
+            response = requests.get(f"{self.cache_server_url}/prompt_cache/{cache_file_name}")
             response.raise_for_status()
             tensors = load(response.content)
 

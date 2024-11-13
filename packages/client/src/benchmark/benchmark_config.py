@@ -7,7 +7,7 @@ from .prompts import PromptName
 
 @dataclass
 class BenchmarkConfig:
-    mode: Literal["no_cache", "local_cache", "server_cache"]
+    client_type: Literal["no_cache", "local", "server"]
     prompt_name: PromptName
     number_suffixes: int
     max_new_tokens: int
