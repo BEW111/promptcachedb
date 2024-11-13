@@ -4,6 +4,7 @@ import itertools
 import requests
 from timeit import timeit
 from typing import Literal
+from pathlib import Path
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache, pipeline  # type: ignore
@@ -73,21 +74,19 @@ def delete_safetensors_files(folder_path):
             print(f"Failed to delete {file}. Reason: {e}")
 
 
-def clear_previous_cache(mode: Literal['local', 'server']):
-    if mode == "local":
-        delete_safetensors_files(LOCAL_PROMPT_CACHE_PATH)
+def clear_previous_cache():
+    delete_safetensors_files(LOCAL_PROMPT_CACHE_PATH)
     
-    if mode == "server":
-        response = requests.post(f"{SERVER_URL}/clear_cache")
-        response.raise_for_status()
+    response = requests.post(f"{SERVER_URL}/clear_cache")
+    response.raise_for_status()
 
 
 
 def run_benchmark():
     model = MODEL_NAME
-    metadata = "running locally nov 8"
+    metadata = "nov-13-run"
 
-    mode_options = ["no_cache", "local_cache", "server_cache"]
+    mode_options = ["server_cache"]
     prompt_name_options = ["wikipedia_llms"]
     number_suffixes_options = [1, 2, 3, 5, 10, 20]
     max_new_tokens_options = [10, 25, 50]
@@ -110,7 +109,7 @@ def run_benchmark():
         run_with_benchmark_config(config)
 
         if mode == "local_cache" or mode == "server_cache":
-            clear_previous_cache(mode)
+            clear_previous_cache()
 
 
 def main() -> int:

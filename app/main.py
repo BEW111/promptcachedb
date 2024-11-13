@@ -1,9 +1,9 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.responses import StreamingResponse
-
 import os
 import shutil
+from pathlib import Path
 
+from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.responses import StreamingResponse
 
 app = FastAPI()
 
@@ -43,6 +43,12 @@ async def load_safetensor(prompt_cache_file_id: str):
     def iterfile():
         with open(file_path, mode="rb") as file_like:
             yield from file_like
+
+    # def iterfile():
+    #     with open(file_path, mode="rb") as file_like:
+    #         CHUNK_SIZE = 1024 * 1024
+    #         while chunk := file_like.read(CHUNK_SIZE):
+    #             yield chunk
     
     return StreamingResponse(iterfile(), media_type="application/octet-stream", headers={
         'Content-Disposition': f'attachment; filename="{prompt_cache_file_id}.safetensors"'
