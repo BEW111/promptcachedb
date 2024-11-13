@@ -2,7 +2,7 @@ import os
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache  # type: ignore
-from promptcachedb_client.cache_pipeline import PipelineWithPromptCache
+from promptcachedb_client.cache_pipeline import pipeline as pc_pipeline
 from promptcachedb_client.client import PromptCacheClient
 
 
@@ -29,18 +29,16 @@ def main() -> int:
     pc_client = PromptCacheClient(client_type="server", cache_server_url="http://localhost:8000", local_cache_path=PROMPT_CACHE_PATH)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, torch_dtype=torch.float16).to(device)
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-    pc_pipeline = PipelineWithPromptCache(model, tokenizer, device, client=pc_client)
+    pc_pipe = pc_pipeline(model=MODEL_NAME, device=device, client=pc_client)
 
-    print("Saving cached prompts...")
-    pc_pipeline.cache_and_upload_prompt(prompt=INITIAL_PROMPT, prompt_name="project_description")
+    print("Uploading cached prompts...")
+    pc_pipe.cache_and_upload_prompt(prompt=INITIAL_PROMPT, prompt_name="project_description")
 
     print("Running model with cached prompt prefix and different prompts")
     prompts = ["\n# Project Name", "\n# Next Steps", "\n# Potential issues"]
     
     for prompt in prompts:
-        response = pc_pipeline.generate_with_cache(
+        response = pc_pipe.generate_with_cache(
             cached_prompt_name="project_description",
             prompt=prompt,
             max_new_tokens=25
