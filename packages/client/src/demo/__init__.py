@@ -26,14 +26,14 @@ Prompt caching + persistent prompt db
 
 def main() -> int:
     print("Demo running!")
-    pc_client = PromptCacheClient(storage_type="server", path_or_url="http://localhost:8000")
+    pc_client = PromptCacheClient(client_type="server", cache_server_url="http://localhost:8000", local_cache_path=PROMPT_CACHE_PATH)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, torch_dtype=torch.float16).to(device)
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
     pc_pipeline = PipelineWithPromptCache(model, tokenizer, device, client=pc_client)
 
-    print("Saving cached prompts to disk...")
+    print("Saving cached prompts...")
     pc_pipeline.cache_and_upload_prompt(prompt=INITIAL_PROMPT, prompt_name="project_description")
 
     print("Running model with cached prompt prefix and different prompts")

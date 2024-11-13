@@ -40,15 +40,10 @@ def run_with_benchmark_config(benchmark_config: BenchmarkConfig):
                 )
             responses.append(response)
     else:
-        storage_type: Literal['local', 'server'] = "local"
-        path_or_url = LOCAL_PROMPT_CACHE_PATH
-
-        if benchmark_config.mode == "server_cache":
-            storage_type = "server"
-            path_or_url = SERVER_URL
+        client_type: Literal['local', 'server'] = "local"
 
         with time_and_log(section_name="create_pc_client", benchmark_config=benchmark_config):
-            pc_client = PromptCacheClient(storage_type=storage_type, path_or_url=path_or_url)
+            pc_client = PromptCacheClient(client_type=client_type, cache_server_url=SERVER_URL, local_cache_path=LOCAL_PROMPT_CACHE_PATH)
 
         with time_and_log(section_name="create_pipeline", benchmark_config=benchmark_config):
             pc_pipe = pc_pipeline(model=benchmark_config.model_name, device=device, client=pc_client)
@@ -93,7 +88,7 @@ def run_benchmark():
     metadata = "running locally nov 8"
 
     mode_options = ["no_cache", "local_cache", "server_cache"]
-    prompt_name_options = ["short_markdown"]
+    prompt_name_options = ["wikipedia_llms"]
     number_suffixes_options = [1, 2, 3, 5, 10, 20]
     max_new_tokens_options = [10, 25, 50]
 
