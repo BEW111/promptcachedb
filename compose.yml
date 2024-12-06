@@ -1,6 +1,8 @@
 services:
   server:
     build: .
+    image: bew111/promptcachedb
+    
     ports:
       - "8000:8000"
 
