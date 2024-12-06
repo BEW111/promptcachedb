@@ -8,7 +8,23 @@ Currently still in progress, but this may be useful if you check some or especia
 - [ ] Re-using very long prompts
 - [ ] Running multiple LLMs or agents across different servers
 
-## Usage
+## Installing and running in your project
+
+The client package is on PyPI, so install with `uv`:
+
+`uv add promptcachedb-client`
+
+or `pip`:
+
+`pip install promptcachedb-client`
+
+The server image is published on Docker Hub:
+
+`docker run -p 8000:8000 bew111/promptcachedb:latest`
+
+See the example code down below for usage.
+
+## Running in this repo
 
 In the current demo, a prompt is cached, sent to a server, retrieved from the server, and then used locally. You
 can test this by:
@@ -33,11 +49,13 @@ The benchmark can be ran with
 
 ## Example code
 
+Here is an snippet where you might have a long context `INITIAL_PROMPT`, so you want to cache and save that context to a server (in this example, the prompt is a long project description). Then you can reuse this context multiple times with different prompts:
+
 ```python
 from promptcachedb_client.cache_pipeline import pipeline as pc_pipeline
 from promptcachedb_client.client import PromptCacheClient
 
-
+# Set up the client
 pc_client = PromptCacheClient(client_type="server", cache_server_url="http://localhost:8000", local_cache_path=PROMPT_CACHE_PATH)
 pc_pipe = pc_pipeline(model=MODEL_NAME, device=device, client=pc_client)
 
