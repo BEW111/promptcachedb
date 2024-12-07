@@ -1,3 +1,4 @@
+import argparse
 import os
 
 import torch
@@ -10,6 +11,7 @@ PROMPT_CACHE_PATH = "./demo_prompt_cache"
 os.makedirs(PROMPT_CACHE_PATH, exist_ok=True)
 
 MODEL_NAME = "Qwen/Qwen2.5-0.5B"
+DEFAULT_SERVER_URL = "http://localhost:8000"
 
 INITIAL_PROMPT="""
 Prompt caching + persistent prompt db
@@ -25,8 +27,15 @@ Prompt caching + persistent prompt db
 
 
 def main() -> int:
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument("--client-type")
+    arg_parser.add_argument("--server-url")
+    args = arg_parser.parse_args()
+    client_type = args.client_type if args.client_type else "server"
+    server_url = args.server_url if args.server_url else DEFAULT_SERVER_URL
+
     print("Demo running!")
-    pc_client = PromptCacheClient(client_type="server", cache_server_url="http://localhost:8000", local_cache_path=PROMPT_CACHE_PATH)
+    pc_client = PromptCacheClient(client_type=client_type, cache_server_url=server_url, local_cache_path=PROMPT_CACHE_PATH)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     pc_pipe = pc_pipeline(model=MODEL_NAME, device=device, client=pc_client)
