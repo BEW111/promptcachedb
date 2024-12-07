@@ -25,7 +25,7 @@ class PromptCacheClient:
         elif self.cache_server_url != None:
             byte_data = save(tensors)
             files = {"prompt_cache_file": (cache_file_name, byte_data)}
-            response = requests.post(f"{self.cache_server_url}/upload", files=files)
+            response = requests.post(f"{self.cache_server_url}/upload/", files=files)
             response.raise_for_status()
 
     
@@ -57,7 +57,7 @@ class PromptCacheClient:
             if self.cache_server_url == None:
                 raise RuntimeError("Cache server url not specified")
             
-            response = requests.get(f"{self.cache_server_url}/prompt_cache/{cache_file_name}")
+            response = requests.get(f"{self.cache_server_url}/prompt_cache/{cache_file_name}/")
             response.raise_for_status()
             tensors = load(response.content)
 
